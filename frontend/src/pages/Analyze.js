@@ -211,25 +211,30 @@ const Analyze = () => {
               <p className="text-sm leading-relaxed" data-testid="analysis-details">{result.analysis}</p>
             </div>
 
-            {/* Send Alerts Button */}
-            <Button
-              onClick={handleSendAlerts}
-              disabled={sendingAlerts}
-              className="w-full h-12 bg-destructive hover:bg-destructive/90 shadow-[0_0_10px_rgba(239,68,68,0.4)] uppercase tracking-wider font-bold"
-              data-testid="send-alerts-button"
-            >
-              {sendingAlerts ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Sending Alerts...
-                </>
-              ) : (
-                <>
-                  <Send className="w-5 h-5 mr-2" />
-                  Send Emergency Alerts
-                </>
-              )}
-            </Button>
+            {/* Alerts Sent Info */}
+            {result.alerts_sent && result.alerts_sent.length > 0 && (
+              <div className="p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
+                <h3 className="text-xs uppercase tracking-wider text-emerald-500 mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  ✓ Alerts Sent Successfully
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {result.alerts_sent.map((alert, index) => (
+                    <span key={index} className="inline-flex items-center px-3 py-1 rounded-sm text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      {alert}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(!result.alerts_sent || result.alerts_sent.length === 0) && (
+              <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/30">
+                <h3 className="text-xs uppercase tracking-wider text-amber-500 mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  ⚠ No Alerts Sent
+                </h3>
+                <p className="text-xs text-muted-foreground">Configure emergency contacts and Twilio credentials to enable automated SMS alerts.</p>
+              </div>
+            )}
 
             {/* Metadata */}
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
