@@ -1,0 +1,141 @@
+{
+  "project_name": "Auto Deployment Collision Analysis",
+  "theme_strategy": {
+    "mode": "dark",
+    "emotional_tone": "Urgent, Precision, Authoritative",
+    "archetype": "The Performance Pro",
+    "description": "A high-contrast, data-dense command center. Dark obsidian backgrounds with electric accent colors. Prioritizes readability in high-pressure situations."
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Barlow Condensed, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-bold tracking-tight uppercase",
+      "h2": "text-2xl md:text-3xl font-semibold tracking-tight",
+      "h3": "text-xl font-medium tracking-wide text-muted-foreground",
+      "body": "text-sm leading-relaxed",
+      "label": "text-xs font-mono uppercase tracking-wider text-muted-foreground"
+    },
+    "imports": [
+      "@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');"
+    ]
+  },
+  "colors": {
+    "background": {
+      "default": "#09090b",
+      "paper": "#0f172a",
+      "overlay": "rgba(9, 9, 11, 0.8)"
+    },
+    "severity": {
+      "normal": {
+        "color": "#10b981",
+        "bg": "rgba(16, 185, 129, 0.1)",
+        "label": "Normal"
+      },
+      "mild": {
+        "color": "#f59e0b",
+        "bg": "rgba(245, 158, 11, 0.1)",
+        "label": "Mild Impact"
+      },
+      "severe": {
+        "color": "#f43f5e",
+        "bg": "rgba(244, 63, 94, 0.1)",
+        "label": "SEVERE COLLISION"
+      }
+    },
+    "accents": {
+      "primary": "#3b82f6",
+      "alert": "#ef4444",
+      "success": "#22c55e",
+      "warning": "#eab308",
+      "process": "#8b5cf6"
+    },
+    "borders": {
+      "subtle": "rgba(255, 255, 255, 0.1)",
+      "highlight": "rgba(255, 255, 255, 0.2)"
+    }
+  },
+  "layout": {
+    "grid_system": "Bento Grid Mode B (High Density)",
+    "container": "max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8",
+    "spacing": {
+      "section_gap": "gap-6",
+      "widget_gap": "gap-4",
+      "internal_padding": "p-6"
+    },
+    "sidebar": {
+      "width": "w-64",
+      "collapsed_width": "w-16",
+      "bg": "bg-card/50 backdrop-blur-xl border-r border-border/40"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 rounded-md shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all uppercase tracking-wider font-bold text-xs h-10 px-6",
+      "destructive": "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md shadow-[0_0_10px_rgba(239,68,68,0.4)]",
+      "outline": "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground rounded-md uppercase tracking-wider text-xs font-medium"
+    },
+    "cards": {
+      "default": "bg-card text-card-foreground rounded-xl border border-border/40 shadow-sm",
+      "glass": "bg-black/40 backdrop-blur-md border border-white/10 rounded-xl",
+      "active": "relative overflow-hidden border-primary/50 shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+    },
+    "badges": {
+      "base": "inline-flex items-center rounded-sm border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+      "normal": "border-transparent bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25",
+      "mild": "border-transparent bg-amber-500/15 text-amber-500 hover:bg-amber-500/25",
+      "severe": "border-transparent bg-rose-500/15 text-rose-500 hover:bg-rose-500/25 animate-pulse"
+    },
+    "inputs": {
+      "default": "flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    }
+  },
+  "visual_enhancers": {
+    "gradients": {
+      "scanline": "linear-gradient(to bottom, transparent, rgba(59, 130, 246, 0.2), transparent)",
+      "severe_glow": "radial-gradient(circle, rgba(244, 63, 94, 0.2) 0%, transparent 70%)"
+    },
+    "textures": {
+      "grid": "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
+      "size": "24px 24px"
+    },
+    "motion": {
+      "scanning": "animate-[scan_2s_ease-in-out_infinite]",
+      "blink": "animate-[pulse_1s_cubic-bezier(0.4,0,0.6,1)_infinite]"
+    }
+  },
+  "image_assets": {
+    "login_background": "https://images.unsplash.com/photo-1728929140669-d5ab2029222a?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "placeholder_cctv": "https://images.unsplash.com/photo-1743069624530-11ff288c0cd1?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "map_texture": "https://images.unsplash.com/photo-1621870616319-eeb7fdf31234?crop=entropy&cs=srgb&fm=jpg&q=85"
+  },
+  "icons": {
+    "library": "lucide-react",
+    "mapping": {
+      "police": "ShieldAlert",
+      "ambulance": "Ambulance",
+      "fire": "Flame",
+      "severity_normal": "CheckCircle2",
+      "severity_mild": "AlertTriangle",
+      "severity_severe": "Siren",
+      "dashboard": "LayoutDashboard",
+      "history": "History",
+      "settings": "Settings",
+      "upload": "UploadCloud"
+    }
+  },
+  "universal_guidelines": [
+    "Use dark colors independently without gradients for backgrounds.",
+    "Do not center align the app container.",
+    "Use 'Barlow Condensed' for all headings to give a technical/dashboard feel.",
+    "Always tint neutral greys with a hint of blue (#0f172a) rather than pure grey.",
+    "Interactive elements must have a defined hover state with increased brightness.",
+    "Use 'sonner' for all toast notifications.",
+    "Ensure all interactive elements have data-testid attributes.",
+    "For the video analysis view, overlay a 'scanning' grid or crosshair to simulate AI processing.",
+    "Severe alerts must use the 'destructive' color set and preferably animate (pulse)."
+  ]
+}
