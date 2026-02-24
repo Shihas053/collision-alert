@@ -202,12 +202,41 @@ async def analyze_video(file: UploadFile = File(...)):
         
         await db.analyses.insert_one(doc)
         
+        # Automatically send alerts based on severity
+        severity = analysis_result['severity'].lower()
+        contacts = await db.contacts.find({}, {"_id": 0}).to_list(100)
+        
+        alerts_sent = []
+        roles_to_alert = []
+        
+        if severity == 'normal':
+            roles_to_alert = ['police']
+        elif severity == 'mild':
+            roles_to_alert = ['police', 'ambulance']
+        elif severity == 'severe':
+            roles_to_alert = ['police', 'ambulance', 'fire']
+        
+        # Send SMS to appropriate contacts
+        for contact in contacts:
+            if contact['role'] in roles_to_alert:
+                message = f"COLLISION ALERT - {severity.upper()} severity detected. Location: {file.filename}. Contact: {contact['name']} ({contact['role']}). Immediate response required."
+                success = await send_sms_alert(contact['phone'], message)
+                if success:
+                    alerts_sent.append(f"{contact['name']} ({contact['role']})")
+        
+        # Update analysis record with alerts sent
+        await db.analyses.update_one(
+            {'id': record.id},
+            {'$set': {'alerts_sent': alerts_sent}}
+        )
+        
         return {
             'id': record.id,
             'severity': record.severity,
             'analysis': analysis_result['analysis'],
             'video_name': file.filename,
-            'timestamp': record.timestamp.isoformat()
+            'timestamp': record.timestamp.isoformat(),
+            'alerts_sent': alerts_sent
         }
     except Exception as e:
         logging.error(f"Error analyzing video: {str(e)}")
