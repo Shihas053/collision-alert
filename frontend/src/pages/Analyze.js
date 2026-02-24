@@ -44,7 +44,13 @@ const Analyze = () => {
       });
 
       setResult(response.data);
-      toast.success('Analysis complete!');
+      
+      // Show success message with alert info
+      if (response.data.alerts_sent && response.data.alerts_sent.length > 0) {
+        toast.success(`Analysis complete! Alerts sent to: ${response.data.alerts_sent.join(', ')}`);
+      } else {
+        toast.success('Analysis complete! No alerts sent (configure contacts and Twilio)');
+      }
     } catch (error) {
       console.error('Error analyzing video:', error);
       toast.error(error.response?.data?.detail || 'Failed to analyze video');
