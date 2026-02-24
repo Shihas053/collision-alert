@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { UploadCloud, Loader2, CheckCircle2, AlertTriangle, Siren, Send } from "lucide-react";
+import { UploadCloud, Loader2, CheckCircle2, AlertTriangle, Siren } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -12,7 +12,6 @@ const Analyze = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
-  const [sendingAlerts, setSendingAlerts] = useState(false);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
