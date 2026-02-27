@@ -187,6 +187,60 @@ const Analyze = () => {
               <p className="text-sm leading-relaxed" data-testid="analysis-details">{result.analysis}</p>
             </div>
 
+            {/* Collision Condition */}
+            {result.condition && (
+              <div className="p-4 bg-black/40 rounded-lg border border-white/10">
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  Collision Condition
+                </h3>
+                <p className="text-sm leading-relaxed" data-testid="collision-condition">{result.condition}</p>
+              </div>
+            )}
+
+            {/* GPS Location */}
+            {result.gps_coordinates && (
+              <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
+                <h3 className="text-xs uppercase tracking-wider text-blue-400 mb-3 flex items-center gap-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  GPS Location Identified
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Coordinates: </span>
+                    <span className="font-mono text-blue-300" data-testid="gps-coordinates">
+                      {result.gps_coordinates.latitude.toFixed(6)}, {result.gps_coordinates.longitude.toFixed(6)}
+                    </span>
+                    <a 
+                      href={`https://www.google.com/maps?q=${result.gps_coordinates.latitude},${result.gps_coordinates.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-2 text-blue-400 hover:text-blue-300 underline text-xs"
+                    >
+                      View on Map
+                    </a>
+                  </div>
+                  {result.location_address && (
+                    <div>
+                      <span className="text-muted-foreground">Address: </span>
+                      <span className="text-foreground" data-testid="location-address">{result.location_address}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {!result.gps_coordinates && (
+              <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/30">
+                <h3 className="text-xs uppercase tracking-wider text-amber-500 mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  ⚠ GPS Not Available
+                </h3>
+                <p className="text-xs text-muted-foreground">No GPS metadata found in video. Location information not available.</p>
+              </div>
+            )}
+
             {/* Alerts Sent Info */}
             {result.alerts_sent && result.alerts_sent.length > 0 && (
               <div className="p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
