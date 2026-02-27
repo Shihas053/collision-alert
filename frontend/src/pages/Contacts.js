@@ -19,6 +19,9 @@ const Contacts = () => {
     name: '',
     phone: '',
     role: 'police',
+    latitude: '',
+    longitude: '',
+    address: ''
   });
 
   useEffect(() => {
