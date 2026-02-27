@@ -78,6 +78,7 @@ class AnalysisRecord(BaseModel):
     location_address: Optional[str] = None
     gps_source: str = "auto"  # auto, manual, none
     traffic_info: Optional[Dict] = None
+    eta_info: Optional[Dict] = None
     alerts_sent: List[str] = []
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
