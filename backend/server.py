@@ -70,8 +70,15 @@ class AnalysisRecord(BaseModel):
     collision_condition: str = ""
     gps_coordinates: Optional[Dict[str, float]] = None
     location_address: Optional[str] = None
+    gps_source: str = "auto"  # auto, manual, none
+    traffic_info: Optional[Dict] = None
     alerts_sent: List[str] = []
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ManualGPSUpdate(BaseModel):
+    analysis_id: str
+    latitude: float
+    longitude: float
 
 class AlertRequest(BaseModel):
     analysis_id: str
