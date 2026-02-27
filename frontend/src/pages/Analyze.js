@@ -245,13 +245,15 @@ const Analyze = () => {
             {/* GPS Location */}
             {result.gps_coordinates && (
               <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
-                <h3 className="text-xs uppercase tracking-wider text-blue-400 mb-3 flex items-center gap-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  GPS Location Identified
-                </h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs uppercase tracking-wider text-blue-400 flex items-center gap-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    GPS Location ({result.gps_source === 'manual' ? 'Manual' : 'Auto-detected'})
+                  </h3>
+                </div>
                 <div className="space-y-2 text-sm">
                   <div>
                     <span className="text-muted-foreground">Coordinates: </span>
@@ -273,16 +275,95 @@ const Analyze = () => {
                       <span className="text-foreground" data-testid="location-address">{result.location_address}</span>
                     </div>
                   )}
+                  {result.traffic_info && result.traffic_info.nearby_roads > 0 && (
+                    <div className="mt-3 pt-3 border-t border-blue-500/20">
+                      <p className="text-xs text-blue-400 mb-2">🚦 Traffic Information</p>
+                      <p className="text-xs text-muted-foreground">
+                        {result.traffic_info.nearby_roads} nearby road(s) detected
+                      </p>
+                      {result.traffic_info.road_types && result.traffic_info.road_types.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {result.traffic_info.road_types.slice(0, 3).map((road, idx) => (
+                            <div key={idx} className="text-xs">
+                              <span className="text-blue-300">{road.name || 'Unnamed'}</span>
+                              <span className="text-muted-foreground ml-2">({road.type})</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {!result.gps_coordinates && (
               <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/30">
-                <h3 className="text-xs uppercase tracking-wider text-amber-500 mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  ⚠ GPS Not Available
-                </h3>
-                <p className="text-xs text-muted-foreground">No GPS metadata found in video. Location information not available.</p>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xs uppercase tracking-wider text-amber-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    ⚠ GPS Not Available
+                  </h3>
+                  <Dialog open={gpsDialogOpen} onOpenChange={setGpsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline" className="h-7 text-xs">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        Add GPS Manually
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#0f172a] border-border/40">
+                      <DialogHeader>
+                        <DialogTitle className="text-xl" style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>
+                          Add GPS Location Manually
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="latitude" className="text-xs uppercase tracking-wider">Latitude</Label>
+                          <Input
+                            id="latitude"
+                            type="number"
+                            step="0.000001"
+                            value={manualGPS.latitude}
+                            onChange={(e) => setManualGPS({ ...manualGPS, latitude: e.target.value })}
+                            placeholder="37.774929"
+                            className="mt-2"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="longitude" className="text-xs uppercase tracking-wider">Longitude</Label>
+                          <Input
+                            id="longitude"
+                            type="number"
+                            step="0.000001"
+                            value={manualGPS.longitude}
+                            onChange={(e) => setManualGPS({ ...manualGPS, longitude: e.target.value })}
+                            placeholder="-122.419416"
+                            className="mt-2"
+                          />
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          <p>💡 Tip: You can get coordinates from Google Maps:</p>
+                          <p className="mt-1">Right-click on location → Click coordinates to copy</p>
+                        </div>
+                        <Button 
+                          onClick={handleManualGPSUpdate} 
+                          disabled={updatingGPS}
+                          className="w-full"
+                        >
+                          {updatingGPS ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Updating...
+                            </>
+                          ) : (
+                            'Update GPS Location'
+                          )}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                <p className="text-xs text-muted-foreground">No GPS metadata found in video. Add location manually for better emergency response.</p>
               </div>
             )}
 
