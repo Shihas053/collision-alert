@@ -459,6 +459,15 @@ async def analyze_video(file: UploadFile = File(...)):
         severity = analysis_result['severity'].lower()
         contacts = await db.contacts.find({}, {"_id": 0}).to_list(100)
         
+        # Calculate ETAs if GPS is available
+        eta_info = None
+        if gps_data:
+            eta_info = await calculate_all_etas(
+                gps_data['latitude'],
+                gps_data['longitude'],
+                contacts
+            )
+        
         alerts_sent = []
         roles_to_alert = []
         
