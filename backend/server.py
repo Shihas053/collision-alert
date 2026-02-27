@@ -484,6 +484,48 @@ async def send_alerts(request: AlertRequest):
         logging.error(f"Error sending alerts: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/update-gps")
+async def update_gps_manually(request: ManualGPSUpdate):
+    """Manually update GPS coordinates for an analysis"""
+    try:
+        # Get address from coordinates
+        location_address = get_address_from_gps(request.latitude, request.longitude)
+        
+        # Get traffic info
+        traffic_info = await get_traffic_info(request.latitude, request.longitude)
+        
+        # Update analysis record
+        update_data = {
+            'gps_coordinates': {
+                'latitude': request.latitude,
+                'longitude': request.longitude
+            },
+            'location_address': location_address,
+            'gps_source': 'manual',
+            'traffic_info': traffic_info
+        }
+        
+        result = await db.analyses.update_one(
+            {'id': request.analysis_id},
+            {'$set': update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Analysis not found")
+        
+        return {
+            'success': True,
+            'gps_coordinates': update_data['gps_coordinates'],
+            'location_address': location_address,
+            'traffic_info': traffic_info,
+            'message': 'GPS updated successfully'
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating GPS: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Contact CRUD
 @api_router.post("/contacts", response_model=EmergencyContact)
 async def create_contact(contact: EmergencyContactCreate):
