@@ -497,6 +497,13 @@ async def analyze_video(file: UploadFile = File(...)):
                 message = f"🚨 COLLISION ALERT - {severity.upper()}\n"
                 message += f"Video: {file.filename}"
                 message += gps_text
+                
+                # Add ETA if available
+                if eta_info and contact['id'] in eta_info:
+                    eta_data = eta_info[contact['id']]
+                    if eta_data.get('eta_minutes'):
+                        message += f"\n⏱️ ETA: {eta_data['eta_minutes']} min ({eta_data.get('distance_km', 0):.1f} km)"
+                
                 message += condition_text
                 message += f"\nContact: {contact['name']} ({contact['role']})"
                 message += "\n⚠️ IMMEDIATE RESPONSE REQUIRED"
@@ -505,10 +512,10 @@ async def analyze_video(file: UploadFile = File(...)):
                 if success:
                     alerts_sent.append(f"{contact['name']} ({contact['role']})")
         
-        # Update analysis record with alerts sent
+        # Update analysis record with alerts sent and ETA
         await db.analyses.update_one(
             {'id': record.id},
-            {'$set': {'alerts_sent': alerts_sent}}
+            {'$set': {'alerts_sent': alerts_sent, 'eta_info': eta_info}}
         )
         
         return {
