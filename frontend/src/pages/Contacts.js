@@ -152,6 +152,55 @@ const Contacts = () => {
                   </SelectContent>
                 </Select>
               </div>
+              
+              {/* Location Section for ETA */}
+              <div className="pt-4 border-t border-border/40">
+                <div className="mb-3">
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    Location (Optional - for ETA calculation)
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Add station/base location to calculate response time
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="contact-latitude" className="text-xs">Latitude</Label>
+                    <Input
+                      id="contact-latitude"
+                      type="number"
+                      step="0.000001"
+                      value={formData.latitude}
+                      onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                      placeholder="37.774929"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="contact-longitude" className="text-xs">Longitude</Label>
+                    <Input
+                      id="contact-longitude"
+                      type="number"
+                      step="0.000001"
+                      value={formData.longitude}
+                      onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                      placeholder="-122.419416"
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <Label htmlFor="contact-address" className="text-xs">Address (Optional)</Label>
+                  <Input
+                    id="contact-address"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="123 Main St, City, State"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90 uppercase tracking-wider" data-testid="submit-contact-button">
                 Add Contact
               </Button>
