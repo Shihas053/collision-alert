@@ -151,6 +151,64 @@ def get_address_from_gps(latitude: float, longitude: float) -> Optional[str]:
         logging.warning(f"Could not get address from GPS: {str(e)}")
         return None
 
+async def get_traffic_info(latitude: float, longitude: float) -> Optional[Dict]:
+    """Get real-time traffic information for location using OpenStreetMap"""
+    try:
+        # Use Overpass API to get nearby roads and traffic info
+        overpass_url = "https://overpass-api.de/api/interpreter"
+        
+        # Query for roads within 100m radius
+        query = f"""
+        [out:json];
+        (
+          way["highway"](around:100,{latitude},{longitude});
+        );
+        out body;
+        >;
+        out skel qt;
+        """
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(overpass_url, data={"data": query}, timeout=aiohttp.ClientTimeout(total=5)) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('elements'):
+                        roads = [elem for elem in data['elements'] if elem.get('type') == 'way']
+                        
+                        traffic_info = {
+                            "nearby_roads": len(roads),
+                            "road_types": [],
+                            "status": "Data retrieved",
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+                        
+                        # Extract road types
+                        for road in roads[:5]:  # Limit to 5 roads
+                            tags = road.get('tags', {})
+                            road_type = tags.get('highway', 'unknown')
+                            road_name = tags.get('name', 'Unnamed')
+                            traffic_info["road_types"].append({
+                                "name": road_name,
+                                "type": road_type,
+                                "max_speed": tags.get('maxspeed', 'N/A')
+                            })
+                        
+                        return traffic_info
+        
+        return {
+            "status": "No traffic data available",
+            "nearby_roads": 0,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logging.warning(f"Could not fetch traffic info: {str(e)}")
+        return {
+            "status": "Traffic data unavailable",
+            "error": str(e),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+
 def extract_frame_from_video(video_bytes: bytes) -> str:
     """Extract a frame from video and convert to base64"""
     try:
