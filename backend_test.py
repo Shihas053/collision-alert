@@ -241,7 +241,9 @@ class CollisionAPITester:
             return ['police', 'ambulance', 'fire']
         return []
 
-def main():
+    def test_analysis_history(self):
+        """Test retrieving analysis history"""
+        return self.run_test("Analysis History", "GET", "analysis-history", 200)
     print("=" * 60)
     print("🚨 COLLISION ANALYSIS API TESTING SUITE")
     print("=" * 60)
