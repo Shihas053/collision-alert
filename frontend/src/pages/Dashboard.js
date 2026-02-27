@@ -135,12 +135,20 @@ const Dashboard = () => {
                   className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-white/10"
                   data-testid={`analysis-${analysis.id}`}
                 >
-                  <div className="flex-1">
+                  <div className="flex-1\">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-medium">{analysis.video_name}</h3>
                       {getSeverityBadge(analysis.severity)}
                     </div>
                     <p className="text-xs text-muted-foreground line-clamp-1">{analysis.analysis_details}</p>
+                    {analysis.gps_coordinates && (
+                      <p className="text-xs text-blue-400 mt-1 flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        </svg>
+                        GPS: {analysis.gps_coordinates.latitude.toFixed(4)}, {analysis.gps_coordinates.longitude.toFixed(4)}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground ml-4">
                     <Clock className="w-3 h-3" />
