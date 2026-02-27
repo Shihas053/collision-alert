@@ -49,11 +49,36 @@ const Analyze = () => {
         },
       });
 
-      setResult(response.data);
+      let analysisResult = response.data;
+
+      // If pre-analysis GPS was provided and video had no GPS, update it
+      if (preAnalysisGPS.enabled && preAnalysisGPS.latitude && preAnalysisGPS.longitude && !analysisResult.gps_coordinates) {
+        try {
+          const gpsUpdateResponse = await axios.post(`${API}/update-gps`, {
+            analysis_id: analysisResult.id,
+            latitude: parseFloat(preAnalysisGPS.latitude),
+            longitude: parseFloat(preAnalysisGPS.longitude)
+          });
+          
+          analysisResult = {
+            ...analysisResult,
+            gps_coordinates: gpsUpdateResponse.data.gps_coordinates,
+            location_address: gpsUpdateResponse.data.location_address,
+            gps_source: 'manual',
+            traffic_info: gpsUpdateResponse.data.traffic_info
+          };
+          
+          toast.info('Manual GPS applied to analysis');
+        } catch (gpsError) {
+          console.error('Error applying manual GPS:', gpsError);
+        }
+      }
+
+      setResult(analysisResult);
       
       // Show success message with alert info
-      if (response.data.alerts_sent && response.data.alerts_sent.length > 0) {
-        toast.success(`Analysis complete! Alerts sent to: ${response.data.alerts_sent.join(', ')}`);
+      if (analysisResult.alerts_sent && analysisResult.alerts_sent.length > 0) {
+        toast.success(`Analysis complete! Alerts sent to: ${analysisResult.alerts_sent.join(', ')}`);
       } else {
         toast.success('Analysis complete! No alerts sent (configure contacts and Twilio)');
       }
