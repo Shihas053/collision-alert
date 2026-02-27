@@ -18,6 +18,7 @@ const Analyze = () => {
   const [gpsDialogOpen, setGpsDialogOpen] = useState(false);
   const [manualGPS, setManualGPS] = useState({ latitude: '', longitude: '' });
   const [updatingGPS, setUpdatingGPS] = useState(false);
+  const [preAnalysisGPS, setPreAnalysisGPS] = useState({ latitude: '', longitude: '', enabled: false });
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
