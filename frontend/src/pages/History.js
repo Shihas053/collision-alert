@@ -109,6 +109,33 @@ const History = () => {
                         {analysis.analysis_details}
                       </p>
 
+                      {/* Collision Condition */}
+                      {analysis.collision_condition && (
+                        <div className="mb-4 p-3 bg-black/60 rounded border border-white/5">
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Condition</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">{analysis.collision_condition}</p>
+                        </div>
+                      )}
+
+                      {/* GPS Information */}
+                      {analysis.gps_coordinates && (
+                        <div className="mb-4 p-3 bg-blue-500/10 rounded border border-blue-500/20">
+                          <p className="text-xs uppercase tracking-wider text-blue-400 mb-2 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            GPS Location
+                          </p>
+                          <p className="text-xs font-mono text-blue-300">
+                            {analysis.gps_coordinates.latitude.toFixed(6)}, {analysis.gps_coordinates.longitude.toFixed(6)}
+                          </p>
+                          {analysis.location_address && (
+                            <p className="text-xs text-muted-foreground mt-1">{analysis.location_address}</p>
+                          )}
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-6 text-xs text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <Clock className="w-3 h-3" />
