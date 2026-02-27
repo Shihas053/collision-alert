@@ -58,29 +58,6 @@ const Analyze = () => {
     }
   };
 
-  const handleSendAlerts = async () => {
-    if (!result) return;
-
-    setSendingAlerts(true);
-    try {
-      const response = await axios.post(`${API}/send-alerts`, {
-        analysis_id: result.id,
-        severity: result.severity,
-      });
-
-      if (response.data.alerts_sent.length > 0) {
-        toast.success(`Alerts sent to: ${response.data.alerts_sent.join(', ')}`);
-      } else {
-        toast.warning('No alerts sent. Please configure emergency contacts and Twilio.');
-      }
-    } catch (error) {
-      console.error('Error sending alerts:', error);
-      toast.error('Failed to send alerts');
-    } finally {
-      setSendingAlerts(false);
-    }
-  };
-
   const getSeverityConfig = (severity) => {
     const configs = {
       normal: {
