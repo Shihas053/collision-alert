@@ -366,7 +366,9 @@ async def analyze_video(file: UploadFile = File(...)):
             analysis_details=analysis_result['analysis'],
             collision_condition=analysis_result['condition'],
             gps_coordinates=gps_data,
-            location_address=location_address
+            location_address=location_address,
+            gps_source=gps_source,
+            traffic_info=traffic_info
         )
         
         doc = record.model_dump()
