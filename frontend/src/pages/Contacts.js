@@ -50,7 +50,7 @@ const Contacts = () => {
       await axios.post(`${API}/contacts`, formData);
       toast.success('Contact added successfully');
       setDialogOpen(false);
-      setFormData({ name: '', phone: '', role: 'police' });
+      setFormData({ name: '', phone: '', role: 'police', latitude: '', longitude: '', address: '' });
       fetchContacts();
     } catch (error) {
       console.error('Error adding contact:', error);
