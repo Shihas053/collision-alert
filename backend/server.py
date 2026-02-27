@@ -49,12 +49,18 @@ class EmergencyContact(BaseModel):
     name: str
     phone: str
     role: str  # police, ambulance, fire
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    address: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class EmergencyContactCreate(BaseModel):
     name: str
     phone: str
     role: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    address: Optional[str] = None
 
 class EmergencyContactUpdate(BaseModel):
     name: Optional[str] = None
