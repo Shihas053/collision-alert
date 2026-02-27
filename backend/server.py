@@ -189,13 +189,13 @@ async def analyze_collision(frame_base64: str) -> dict:
         chat = LlmChat(
             api_key=api_key,
             session_id=str(uuid.uuid4()),
-            system_message="You are an expert collision analysis AI. Analyze vehicle collision videos and classify them into three categories: NORMAL (minor contact, no visible damage), MILD (moderate impact, some visible damage, low-speed collision), or SEVERE (high-speed collision, significant damage, potential injuries). Provide brief analysis."
+            system_message="You are an expert collision analysis AI. Analyze vehicle collision videos and classify them into three categories: NORMAL (minor contact, no visible damage), MILD (moderate impact, some visible damage, low-speed collision), or SEVERE (high-speed collision, significant damage, potential injuries). Provide detailed collision condition analysis."
         ).with_model("openai", "gpt-5.2")
         
         image_content = ImageContent(image_base64=frame_base64)
         
         user_message = UserMessage(
-            text="Analyze this collision scene. Classify the severity as NORMAL, MILD, or SEVERE. Then provide a brief 2-3 sentence analysis explaining your classification. Format your response as: SEVERITY: [classification]\nANALYSIS: [your analysis]",
+            text="Analyze this collision scene. Provide:\n1. SEVERITY: Classify as NORMAL, MILD, or SEVERE\n2. CONDITION: Detailed description of the collision (vehicle damage, impact point, estimated speed, visible injuries, environmental factors)\n3. ANALYSIS: Brief 2-3 sentence summary\n\nFormat your response as:\nSEVERITY: [classification]\nCONDITION: [detailed condition]\nANALYSIS: [summary]",
             file_contents=[image_content]
         )
         
@@ -204,9 +204,10 @@ async def analyze_collision(frame_base64: str) -> dict:
         # Parse response
         lines = response.strip().split('\n')
         severity = "unknown"
+        condition = ""
         analysis = response
         
-        for line in lines:
+        for i, line in enumerate(lines):
             if line.startswith('SEVERITY:'):
                 severity_text = line.replace('SEVERITY:', '').strip().lower()
                 if 'normal' in severity_text:
@@ -215,11 +216,21 @@ async def analyze_collision(frame_base64: str) -> dict:
                     severity = 'mild'
                 elif 'severe' in severity_text:
                     severity = 'severe'
+            elif line.startswith('CONDITION:'):
+                # Get condition (may span multiple lines)
+                condition = line.replace('CONDITION:', '').strip()
+                # Check next lines if they don't start with ANALYSIS
+                for j in range(i+1, len(lines)):
+                    if not lines[j].startswith('ANALYSIS:'):
+                        condition += " " + lines[j].strip()
+                    else:
+                        break
             elif line.startswith('ANALYSIS:'):
                 analysis = line.replace('ANALYSIS:', '').strip()
         
         return {
             'severity': severity,
+            'condition': condition or analysis,
             'analysis': analysis,
             'raw_response': response
         }
