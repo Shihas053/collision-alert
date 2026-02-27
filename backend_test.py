@@ -289,7 +289,7 @@ class CollisionAPITester:
     print("\n🎯 SEVERITY-BASED ALERT LOGIC TESTS")
     tester.test_severity_based_alerts()
     
-    # Test 4: Analysis History
+    # Test 5: Analysis History
     print("\n📊 HISTORY TESTS")
     success, history = tester.test_analysis_history()
     if success:
