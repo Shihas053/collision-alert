@@ -267,6 +267,18 @@ async def analyze_video(file: UploadFile = File(...)):
     try:
         video_bytes = await file.read()
         
+        # Extract GPS coordinates from video
+        gps_data = extract_gps_from_video(video_bytes)
+        location_address = None
+        
+        if gps_data:
+            logging.info(f"GPS found: {gps_data}")
+            # Get human-readable address
+            location_address = get_address_from_gps(
+                gps_data['latitude'], 
+                gps_data['longitude']
+            )
+        
         # Extract frame
         frame_base64 = extract_frame_from_video(video_bytes)
         
@@ -277,7 +289,10 @@ async def analyze_video(file: UploadFile = File(...)):
         record = AnalysisRecord(
             video_name=file.filename,
             severity=analysis_result['severity'],
-            analysis_details=analysis_result['analysis']
+            analysis_details=analysis_result['analysis'],
+            collision_condition=analysis_result['condition'],
+            gps_coordinates=gps_data,
+            location_address=location_address
         )
         
         doc = record.model_dump()
@@ -300,10 +315,27 @@ async def analyze_video(file: UploadFile = File(...)):
         elif severity == 'severe':
             roles_to_alert = ['police', 'ambulance', 'fire']
         
+        # Build SMS message with GPS and condition
+        gps_text = ""
+        if gps_data:
+            gps_text = f"\nGPS: {gps_data['latitude']:.6f}, {gps_data['longitude']:.6f}"
+            if location_address:
+                gps_text += f"\nLocation: {location_address}"
+        else:
+            gps_text = "\nGPS: Not available in video"
+        
+        condition_text = f"\nCondition: {analysis_result['condition'][:150]}"
+        
         # Send SMS to appropriate contacts
         for contact in contacts:
             if contact['role'] in roles_to_alert:
-                message = f"COLLISION ALERT - {severity.upper()} severity detected. Location: {file.filename}. Contact: {contact['name']} ({contact['role']}). Immediate response required."
+                message = f"🚨 COLLISION ALERT - {severity.upper()}\n"
+                message += f"Video: {file.filename}"
+                message += gps_text
+                message += condition_text
+                message += f"\nContact: {contact['name']} ({contact['role']})"
+                message += "\n⚠️ IMMEDIATE RESPONSE REQUIRED"
+                
                 success = await send_sms_alert(contact['phone'], message)
                 if success:
                     alerts_sent.append(f"{contact['name']} ({contact['role']})")
@@ -318,7 +350,10 @@ async def analyze_video(file: UploadFile = File(...)):
             'id': record.id,
             'severity': record.severity,
             'analysis': analysis_result['analysis'],
+            'condition': analysis_result['condition'],
             'video_name': file.filename,
+            'gps_coordinates': gps_data,
+            'location_address': location_address,
             'timestamp': record.timestamp.isoformat(),
             'alerts_sent': alerts_sent
         }
