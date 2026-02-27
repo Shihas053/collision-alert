@@ -476,6 +476,37 @@ const Analyze = () => {
               </div>
             )}
 
+            {/* ETA Information */}
+            {result.eta_info && Object.keys(result.eta_info).length > 0 && (
+              <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
+                <h3 className="text-xs uppercase tracking-wider text-blue-400 mb-3 flex items-center gap-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Estimated Response Times
+                </h3>
+                <div className="space-y-2">
+                  {Object.values(result.eta_info).map((eta, index) => (
+                    eta.status === 'calculated' && eta.eta_minutes && (
+                      <div key={index} className="flex items-center justify-between p-2 bg-black/40 rounded">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-foreground">{eta.contact_name}</span>
+                          <span className="text-xs text-muted-foreground">({eta.role})</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-muted-foreground">{eta.distance_km} km</span>
+                          <span className="text-sm font-bold text-blue-400">~{eta.eta_minutes} min</span>
+                        </div>
+                      </div>
+                    )
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  * Emergency vehicle response times (adjusted for lights & sirens)
+                </p>
+              </div>
+            )}
+
             {(!result.alerts_sent || result.alerts_sent.length === 0) && (
               <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/30">
                 <h3 className="text-xs uppercase tracking-wider text-amber-500 mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
