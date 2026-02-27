@@ -397,8 +397,10 @@ async def analyze_video(file: UploadFile = File(...)):
             gps_text = f"\nGPS: {gps_data['latitude']:.6f}, {gps_data['longitude']:.6f}"
             if location_address:
                 gps_text += f"\nLocation: {location_address}"
+            if traffic_info and traffic_info.get('nearby_roads', 0) > 0:
+                gps_text += f"\nTraffic: {traffic_info['nearby_roads']} nearby roads detected"
         else:
-            gps_text = "\nGPS: Not available in video"
+            gps_text = "\nGPS: Not available (manual override available)"
         
         condition_text = f"\nCondition: {analysis_result['condition'][:150]}"
         
