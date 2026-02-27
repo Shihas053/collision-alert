@@ -6,7 +6,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Optional
+from typing import List, Optional, Dict
 import uuid
 from datetime import datetime, timezone
 import base64
@@ -14,6 +14,10 @@ import cv2
 import numpy as np
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 from twilio.rest import Client
+import exifread
+from geopy.geocoders import Nominatim
+from PIL import Image
+import io
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
