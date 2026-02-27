@@ -528,6 +528,7 @@ async def analyze_video(file: UploadFile = File(...)):
             'location_address': location_address,
             'gps_source': gps_source,
             'traffic_info': traffic_info,
+            'eta_info': eta_info,
             'timestamp': record.timestamp.isoformat(),
             'alerts_sent': alerts_sent
         }
