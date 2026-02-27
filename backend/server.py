@@ -66,6 +66,9 @@ class AnalysisRecord(BaseModel):
     video_name: str
     severity: str  # normal, mild, severe
     analysis_details: str
+    collision_condition: str = ""
+    gps_coordinates: Optional[Dict[str, float]] = None
+    location_address: Optional[str] = None
     alerts_sent: List[str] = []
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
