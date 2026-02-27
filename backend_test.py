@@ -125,7 +125,7 @@ class CollisionAPITester:
         )
 
     def test_video_analysis(self):
-        """Test video analysis with OpenAI vision"""
+        """Test video analysis with OpenAI vision - should now automatically send alerts"""
         video_path = self.create_test_video()
         if not video_path:
             print("❌ Could not create test video")
@@ -135,7 +135,7 @@ class CollisionAPITester:
             with open(video_path, 'rb') as f:
                 files = {'file': ('test_collision.mp4', f, 'video/mp4')}
                 success, response = self.run_test(
-                    "Video Analysis",
+                    "Video Analysis (Auto-Alert)",
                     "POST",
                     "analyze",
                     200,
@@ -149,6 +149,25 @@ class CollisionAPITester:
                 
             if success and 'id' in response:
                 self.analysis_ids.append(response['id'])
+                
+                # Test the new automatic alert functionality
+                if 'alerts_sent' in response:
+                    print(f"✅ alerts_sent field present: {response['alerts_sent']}")
+                    
+                    # Test severity-based alert logic
+                    severity = response.get('severity', '').lower()
+                    alerts_sent = response.get('alerts_sent', [])
+                    
+                    print(f"📊 Severity: {severity}, Alerts sent: {len(alerts_sent)}")
+                    
+                    # Since Twilio is not configured, alerts_sent should be empty but field should exist
+                    if len(alerts_sent) == 0:
+                        print("ℹ️  No alerts sent (expected - Twilio not configured)")
+                    else:
+                        print(f"📨 Alerts sent to: {', '.join(alerts_sent)}")
+                else:
+                    print("❌ Missing alerts_sent field in response")
+                    return False, response
                 
             return success, response
         except Exception as e:
