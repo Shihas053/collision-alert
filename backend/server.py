@@ -77,6 +77,72 @@ class AlertRequest(BaseModel):
     severity: str
 
 # Helper functions
+def extract_gps_from_video(video_bytes: bytes) -> Optional[Dict]:
+    """Extract GPS coordinates from video metadata or frame EXIF data"""
+    try:
+        # Save video temporarily to extract first frame
+        temp_file = f"/tmp/{uuid.uuid4()}.mp4"
+        with open(temp_file, 'wb') as f:
+            f.write(video_bytes)
+        
+        # Extract first frame
+        cap = cv2.VideoCapture(temp_file)
+        ret, frame = cap.read()
+        cap.release()
+        
+        if ret:
+            # Convert frame to JPEG for EXIF reading
+            _, buffer = cv2.imencode('.jpg', frame)
+            image_bytes = io.BytesIO(buffer.tobytes())
+            
+            # Try to read EXIF data
+            tags = exifread.process_file(image_bytes)
+            
+            # Look for GPS coordinates
+            gps_latitude = tags.get('GPS GPSLatitude')
+            gps_latitude_ref = tags.get('GPS GPSLatitudeRef')
+            gps_longitude = tags.get('GPS GPSLongitude')
+            gps_longitude_ref = tags.get('GPS GPSLongitudeRef')
+            
+            if gps_latitude and gps_longitude:
+                # Convert GPS coordinates to decimal format
+                lat = convert_to_degrees(gps_latitude)
+                if gps_latitude_ref and str(gps_latitude_ref) == 'S':
+                    lat = -lat
+                    
+                lon = convert_to_degrees(gps_longitude)
+                if gps_longitude_ref and str(gps_longitude_ref) == 'W':
+                    lon = -lon
+                
+                os.remove(temp_file)
+                return {'latitude': lat, 'longitude': lon}
+        
+        os.remove(temp_file)
+        return None
+    except Exception as e:
+        logging.warning(f"Could not extract GPS from video: {str(e)}")
+        return None
+
+def convert_to_degrees(value):
+    """Convert GPS coordinates to degrees in float format"""
+    try:
+        d = float(value.values[0].num) / float(value.values[0].den)
+        m = float(value.values[1].num) / float(value.values[1].den)
+        s = float(value.values[2].num) / float(value.values[2].den)
+        return d + (m / 60.0) + (s / 3600.0)
+    except:
+        return 0
+
+def get_address_from_gps(latitude: float, longitude: float) -> Optional[str]:
+    """Get human-readable address from GPS coordinates"""
+    try:
+        geolocator = Nominatim(user_agent="collision_analysis")
+        location = geolocator.reverse(f"{latitude}, {longitude}", timeout=5)
+        return location.address if location else None
+    except Exception as e:
+        logging.warning(f"Could not get address from GPS: {str(e)}")
+        return None
+
 def extract_frame_from_video(video_bytes: bytes) -> str:
     """Extract a frame from video and convert to base64"""
     try:
