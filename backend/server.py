@@ -589,6 +589,10 @@ async def update_gps_manually(request: ManualGPSUpdate):
         # Get traffic info
         traffic_info = await get_traffic_info(request.latitude, request.longitude)
         
+        # Calculate ETAs for emergency contacts
+        contacts = await db.contacts.find({}, {"_id": 0}).to_list(100)
+        eta_info = await calculate_all_etas(request.latitude, request.longitude, contacts)
+        
         # Update analysis record
         update_data = {
             'gps_coordinates': {
@@ -597,7 +601,8 @@ async def update_gps_manually(request: ManualGPSUpdate):
             },
             'location_address': location_address,
             'gps_source': 'manual',
-            'traffic_info': traffic_info
+            'traffic_info': traffic_info,
+            'eta_info': eta_info
         }
         
         result = await db.analyses.update_one(
@@ -613,6 +618,7 @@ async def update_gps_manually(request: ManualGPSUpdate):
             'gps_coordinates': update_data['gps_coordinates'],
             'location_address': location_address,
             'traffic_info': traffic_info,
+            'eta_info': eta_info,
             'message': 'GPS updated successfully'
         }
     except HTTPException:
