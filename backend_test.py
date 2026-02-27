@@ -268,17 +268,26 @@ class CollisionAPITester:
     if success:
         print(f"📋 Found {len(contacts)} contacts in system")
     
-    # Test 3: Video Analysis
-    print("\n🎥 VIDEO ANALYSIS TESTS")
+    # Test 3: Video Analysis with Automatic Alerts
+    print("\n🎥 VIDEO ANALYSIS + AUTO-ALERT TESTS")
     analysis_success, analysis_result = tester.test_video_analysis()
     
-    if analysis_success and 'id' in analysis_result:
+    if analysis_success:
         print(f"🤖 Analysis Result: {analysis_result.get('severity', 'unknown')} severity")
         print(f"📝 Analysis Details: {analysis_result.get('analysis', 'No details')[:100]}...")
         
-        # Test alert sending
-        print("\n🚨 ALERT SYSTEM TESTS")
-        tester.test_send_alerts(analysis_result['id'], analysis_result['severity'])
+        # Test the alerts_sent field specifically
+        if 'alerts_sent' in analysis_result:
+            alerts = analysis_result['alerts_sent']
+            print(f"📨 Auto-sent alerts: {len(alerts)} contacts notified")
+            if alerts:
+                print(f"📋 Recipients: {', '.join(alerts)}")
+        else:
+            print("❌ Missing alerts_sent field in analyze response")
+    
+    # Test 4: Severity-Based Alert Logic (if we have time)
+    print("\n🎯 SEVERITY-BASED ALERT LOGIC TESTS")
+    tester.test_severity_based_alerts()
     
     # Test 4: Analysis History
     print("\n📊 HISTORY TESTS")
