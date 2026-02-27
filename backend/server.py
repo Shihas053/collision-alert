@@ -216,6 +216,77 @@ async def get_traffic_info(latitude: float, longitude: float) -> Optional[Dict]:
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
+async def calculate_eta(from_lat: float, from_lon: float, to_lat: float, to_lon: float, service_type: str = "car") -> Optional[Dict]:
+    """Calculate ETA from emergency responder location to collision site using OSRM"""
+    try:
+        # OSRM routing API (free, open-source)
+        osrm_url = f"https://router.project-osrm.org/route/v1/driving/{from_lon},{from_lat};{to_lon},{to_lat}"
+        
+        params = {
+            "overview": "false",
+            "steps": "false"
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(osrm_url, params=params, timeout=aiohttp.ClientTimeout(total=5)) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('code') == 'Ok' and data.get('routes'):
+                        route = data['routes'][0]
+                        
+                        distance_km = route['distance'] / 1000  # Convert meters to km
+                        duration_sec = route['duration']
+                        duration_min = int(duration_sec / 60)
+                        
+                        # Add emergency vehicle speed bonus (typically 1.3-1.5x faster)
+                        emergency_duration_min = int(duration_min / 1.4)
+                        
+                        return {
+                            "distance_km": round(distance_km, 2),
+                            "duration_minutes": duration_min,
+                            "emergency_duration_minutes": emergency_duration_min,
+                            "status": "calculated",
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+        
+        return {
+            "status": "Route not found",
+            "distance_km": None,
+            "duration_minutes": None,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logging.warning(f"Could not calculate ETA: {str(e)}")
+        return {
+            "status": "ETA calculation unavailable",
+            "error": str(e),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+
+async def calculate_all_etas(collision_lat: float, collision_lon: float, contacts: List[Dict]) -> Dict:
+    """Calculate ETAs for all emergency contacts with location data"""
+    eta_results = {}
+    
+    for contact in contacts:
+        if contact.get('latitude') and contact.get('longitude'):
+            eta_data = await calculate_eta(
+                contact['latitude'],
+                contact['longitude'],
+                collision_lat,
+                collision_lon
+            )
+            
+            eta_results[contact['id']] = {
+                "contact_name": contact['name'],
+                "role": contact['role'],
+                "eta_minutes": eta_data.get('emergency_duration_minutes', eta_data.get('duration_minutes')),
+                "distance_km": eta_data.get('distance_km'),
+                "status": eta_data.get('status')
+            }
+    
+    return eta_results
+
 def extract_frame_from_video(video_bytes: bytes) -> str:
     """Extract a frame from video and convert to base64"""
     try:
