@@ -64,6 +64,45 @@ const Analyze = () => {
     }
   };
 
+  const handleManualGPSUpdate = async () => {
+    if (!manualGPS.latitude || !manualGPS.longitude) {
+      toast.error('Please enter both latitude and longitude');
+      return;
+    }
+
+    if (!result || !result.id) {
+      toast.error('No analysis to update');
+      return;
+    }
+
+    setUpdatingGPS(true);
+    try {
+      const response = await axios.post(`${API}/update-gps`, {
+        analysis_id: result.id,
+        latitude: parseFloat(manualGPS.latitude),
+        longitude: parseFloat(manualGPS.longitude)
+      });
+
+      // Update result with new GPS data
+      setResult({
+        ...result,
+        gps_coordinates: response.data.gps_coordinates,
+        location_address: response.data.location_address,
+        gps_source: 'manual',
+        traffic_info: response.data.traffic_info
+      });
+
+      toast.success('GPS location updated successfully!');
+      setGpsDialogOpen(false);
+      setManualGPS({ latitude: '', longitude: '' });
+    } catch (error) {
+      console.error('Error updating GPS:', error);
+      toast.error('Failed to update GPS');
+    } finally {
+      setUpdatingGPS(false);
+    }
+  };
+
   const getSeverityConfig = (severity) => {
     const configs = {
       normal: {
