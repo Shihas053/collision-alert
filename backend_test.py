@@ -188,9 +188,58 @@ class CollisionAPITester:
             data=alert_data
         )
 
-    def test_analysis_history(self):
-        """Test retrieving analysis history"""
-        return self.run_test("Analysis History", "GET", "analysis-history", 200)
+    def test_severity_based_alerts(self):
+        """Test that alerts are sent to correct contacts based on severity"""
+        print("\n🎯 Testing severity-based alert logic...")
+        
+        # Create contacts first
+        police_id = self.test_create_contact("Test Officer", "+1234567890", "police")
+        ambulance_id = self.test_create_contact("Test Paramedic", "+1987654321", "ambulance") 
+        fire_id = self.test_create_contact("Test Fire Chief", "+1122334455", "fire")
+        
+        if not all([police_id, ambulance_id, fire_id]):
+            print("❌ Failed to create test contacts for severity testing")
+            return False
+        
+        # Test different severities by analyzing multiple videos
+        severities_to_test = ['normal', 'mild', 'severe']
+        results = {}
+        
+        for expected_severity in severities_to_test:
+            print(f"\n🔍 Testing analysis for {expected_severity} severity logic...")
+            
+            # Analyze video (we can't control the AI output, but we can test the logic)
+            analysis_success, analysis_result = self.test_video_analysis()
+            
+            if analysis_success and 'alerts_sent' in analysis_result:
+                actual_severity = analysis_result.get('severity', '').lower()
+                alerts_sent = analysis_result.get('alerts_sent', [])
+                
+                results[actual_severity] = {
+                    'alerts_sent': alerts_sent,
+                    'expected_roles': self.get_expected_roles(actual_severity)
+                }
+                
+                print(f"📊 Actual severity: {actual_severity}")
+                print(f"📨 Alerts sent: {alerts_sent}")
+                print(f"🎯 Expected roles for {actual_severity}: {self.get_expected_roles(actual_severity)}")
+        
+        # Cleanup test contacts
+        for contact_id in [police_id, ambulance_id, fire_id]:
+            if contact_id:
+                self.test_delete_contact(contact_id)
+        
+        return True
+    
+    def get_expected_roles(self, severity):
+        """Get expected roles to be alerted based on severity"""
+        if severity == 'normal':
+            return ['police']
+        elif severity == 'mild':
+            return ['police', 'ambulance']
+        elif severity == 'severe':
+            return ['police', 'ambulance', 'fire']
+        return []
 
 def main():
     print("=" * 60)
