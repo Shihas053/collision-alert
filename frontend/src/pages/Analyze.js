@@ -1,8 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
-import { UploadCloud, Loader2, CheckCircle2, AlertTriangle, Siren } from "lucide-react";
+import { UploadCloud, Loader2, CheckCircle2, AlertTriangle, Siren, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -12,6 +15,9 @@ const Analyze = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
+  const [gpsDialogOpen, setGpsDialogOpen] = useState(false);
+  const [manualGPS, setManualGPS] = useState({ latitude: '', longitude: '' });
+  const [updatingGPS, setUpdatingGPS] = useState(false);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
