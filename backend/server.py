@@ -336,12 +336,20 @@ async def analyze_video(file: UploadFile = File(...)):
         # Extract GPS coordinates from video
         gps_data = extract_gps_from_video(video_bytes)
         location_address = None
+        traffic_info = None
+        gps_source = "none"
         
         if gps_data:
             logging.info(f"GPS found: {gps_data}")
+            gps_source = "auto"
             # Get human-readable address
             location_address = get_address_from_gps(
                 gps_data['latitude'], 
+                gps_data['longitude']
+            )
+            # Get traffic information
+            traffic_info = await get_traffic_info(
+                gps_data['latitude'],
                 gps_data['longitude']
             )
         
