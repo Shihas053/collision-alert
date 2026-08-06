@@ -280,9 +280,8 @@ MIT License - feel free to use for personal or commercial projects
 
 For issues or questions:
 - Check troubleshooting section above
-- Review API documentation
-- Contact support at: support@emergent.sh
+
 
 ---
 
-**Built with ❤️ using Emergent AI Platform**
+
